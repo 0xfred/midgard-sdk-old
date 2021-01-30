@@ -26,7 +26,43 @@ import {
   Queue,
 } from './types';
 
-class Midgard {
+export interface MidgardSDKV2 {
+  version: string;
+  getBaseUrl: () => string;
+  getHealth: () => Promise<Health>;
+  getPools: (status?: PoolStatus) => Promise<PoolDetail[]>;
+  getPoolDetail: (asset: string) => Promise<PoolDetail>;
+  getPoolStats: (param: {
+    asset: string;
+    period: StatsPeriod;
+  }) => Promise<PoolStatsDetail>;
+  getPoolStatsV1: (asset: string) => Promise<PoolLegacyDetail>;
+  getDepthHistory: (param: {
+    pool: string;
+    query?: HistoryQuery;
+  }) => Promise<DepthHistory>;
+  getEarningsHistory: (query: HistoryQuery) => Promise<EarningsHistory>;
+  getSwapHistory: (param: {
+    pool?: string;
+    query?: HistoryQuery;
+  }) => Promise<SwapHistory>;
+  getLiquidityHistory: (param: {
+    pool?: string;
+    query?: HistoryQuery;
+  }) => Promise<LiquidityHistory>;
+  getNodes: () => Promise<Node[]>;
+  getNetworkData: () => Promise<Network>;
+  getActions: (params: ActionListParams) => Promise<ActionsList>;
+  getMembersAddresses: () => Promise<string[]>;
+  getMemberDetail: (address: string) => Promise<MemberDetails>;
+  getStats: () => Promise<StatsData>;
+  getProxiedConstants: () => Promise<Constants>;
+  getProxiedInboundAddresses: () => Promise<InboundAddresses>;
+  getProxiedLastblock: () => Promise<Lastblock>;
+  getProxiedQueue: () => Promise<Queue>;
+}
+
+class Midgard implements MidgardSDKV2 {
   private baseUrl: string;
   private apiConfig: Configuration;
   private midgardAPI: DefaultApi;
