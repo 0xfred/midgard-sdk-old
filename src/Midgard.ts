@@ -27,7 +27,7 @@ import {
 } from './types';
 
 export interface MidgardSDKV2 {
-  version: string;
+  getVersion: () => string;
   getBaseUrl: () => string;
   getHealth: () => Promise<Health>;
   getPools: (status?: PoolStatus) => Promise<PoolDetail[]>;
@@ -62,12 +62,12 @@ export interface MidgardSDKV2 {
   getProxiedQueue: () => Promise<Queue>;
 }
 
-class Midgard implements MidgardSDKV2 {
+class MidgardV2 implements MidgardSDKV2 {
   private baseUrl: string;
   private apiConfig: Configuration;
   private midgardAPI: DefaultApi;
 
-  public readonly version = 'V2';
+  private readonly version = 'V2';
 
   constructor(network: NetworkType = 'chaosnet') {
     this.baseUrl =
@@ -76,6 +76,10 @@ class Midgard implements MidgardSDKV2 {
     this.apiConfig = new Configuration({ basePath: this.baseUrl });
     this.midgardAPI = new DefaultApi(this.apiConfig);
   }
+
+  getVersion = (): string => {
+    return this.version;
+  };
 
   getBaseUrl = (): string => {
     return this.baseUrl;
@@ -332,4 +336,4 @@ class Midgard implements MidgardSDKV2 {
   }
 }
 
-export default Midgard;
+export { MidgardV2 };
