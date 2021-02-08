@@ -3,6 +3,7 @@ import getMidgardBaseUrl from '@thorchain/asgardex-midgard';
 import { DefaultApi } from './api';
 import { InboundAddressesItem } from './api/api';
 import { Configuration } from './api/configuration';
+import { MIDGARD_TESTNET_URL } from './config';
 import {
   NetworkType,
   Health,
@@ -82,7 +83,11 @@ class MidgardV2 implements MidgardSDKV2 {
    */
   private setBaseUrl = async (noCache = false) => {
     try {
-      this.baseUrl = await getMidgardBaseUrl(this.network, noCache);
+      if (this.network === 'testnet') {
+        this.baseUrl = MIDGARD_TESTNET_URL;
+      } else {
+        this.baseUrl = await getMidgardBaseUrl(this.network, noCache);
+      }
     } catch (error) {
       throw error;
     }
@@ -368,7 +373,7 @@ class MidgardV2 implements MidgardSDKV2 {
   async getInboundAddressByChain(chain: string): Promise<PoolAddress | null> {
     try {
       const inboundData = await this.getInboundAddresses();
-      const addresses = inboundData?.current ?? [];
+      const addresses = inboundData || [];
 
       const chainAddress = addresses.find(
         (item: InboundAddressesItem) => item.chain === chain,

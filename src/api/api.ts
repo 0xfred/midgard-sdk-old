@@ -467,14 +467,7 @@ export interface Health {
  * @export
  * @interface InboundAddresses
  */
-export interface InboundAddresses {
-  /**
-   *
-   * @type {Array<InboundAddressesItem>}
-   * @memberof InboundAddresses
-   */
-  current: Array<InboundAddressesItem>;
-}
+export type InboundAddresses = Array<InboundAddressesItem>;
 /**
  *
  * @export
