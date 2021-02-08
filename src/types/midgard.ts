@@ -4,7 +4,7 @@ export * from '../api';
 
 export type { ActionsList };
 
-export type NetworkType = 'testnet' | 'chaosnet';
+export type NetworkType = 'testnet' | 'chaosnet' | 'mainnet';
 
 export type PoolStatus = 'available' | 'staged' | 'suspended';
 

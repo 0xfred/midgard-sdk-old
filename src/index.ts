@@ -1,3 +1,2 @@
 export * from './Midgard';
 export * from './types';
-export * from './config';

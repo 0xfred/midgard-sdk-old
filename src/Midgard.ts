@@ -1,6 +1,7 @@
+import getMidgardBaseUrl from '@thorchain/asgardex-midgard';
+
 import { DefaultApi } from './api';
 import { Configuration } from './api/configuration';
-import { midgardApiUrl } from './config';
 import {
   NetworkType,
   Health,
@@ -63,19 +64,35 @@ export interface MidgardSDKV2 {
 }
 
 class MidgardV2 implements MidgardSDKV2 {
-  private baseUrl: string;
-  private apiConfig: Configuration;
-  private midgardAPI: DefaultApi;
+  private baseUrl = '';
+  private network: NetworkType;
 
   private readonly version = 'V2';
 
-  constructor(network: NetworkType = 'chaosnet') {
-    this.baseUrl =
-      network === 'chaosnet' ? midgardApiUrl.chaosnet : midgardApiUrl.testnet;
-
-    this.apiConfig = new Configuration({ basePath: this.baseUrl });
-    this.midgardAPI = new DefaultApi(this.apiConfig);
+  constructor(network: NetworkType = 'testnet') {
+    this.network = network;
   }
+
+  /**
+   * set midgard base url
+   */
+  private setBaseUrl = async (refresh = false) => {
+    try {
+      this.baseUrl = await getMidgardBaseUrl(this.network, refresh);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  /**
+   * get midgard base url
+   */
+  getMidgard = async (refresh = false) => {
+    this.setBaseUrl(refresh);
+
+    const apiConfig = new Configuration({ basePath: this.baseUrl });
+    return new DefaultApi(apiConfig);
+  };
 
   getVersion = (): string => {
     return this.version;
@@ -87,7 +104,8 @@ class MidgardV2 implements MidgardSDKV2 {
 
   async getHealth(): Promise<Health> {
     try {
-      const { data } = await this.midgardAPI.getHealth();
+      const midgard = await this.getMidgard();
+      const { data } = await midgard.getHealth();
 
       return data;
     } catch (error) {
@@ -97,7 +115,8 @@ class MidgardV2 implements MidgardSDKV2 {
 
   async getPools(status?: PoolStatus): Promise<PoolDetail[]> {
     try {
-      const { data } = await this.midgardAPI.getPools(status);
+      const midgard = await this.getMidgard();
+      const { data } = await midgard.getPools(status);
 
       return data;
     } catch (error) {
@@ -107,7 +126,8 @@ class MidgardV2 implements MidgardSDKV2 {
 
   async getPoolDetail(asset: string): Promise<PoolDetail> {
     try {
-      const { data } = await this.midgardAPI.getPool(asset);
+      const midgard = await this.getMidgard();
+      const { data } = await midgard.getPool(asset);
 
       return data;
     } catch (error) {
@@ -123,7 +143,8 @@ class MidgardV2 implements MidgardSDKV2 {
     period: StatsPeriod;
   }): Promise<PoolStatsDetail> {
     try {
-      const { data } = await this.midgardAPI.getPoolStats(asset, period);
+      const midgard = await this.getMidgard();
+      const { data } = await midgard.getPoolStats(asset, period);
 
       return data;
     } catch (error) {
@@ -133,7 +154,8 @@ class MidgardV2 implements MidgardSDKV2 {
 
   async getPoolStatsV1(asset: string): Promise<PoolLegacyDetail> {
     try {
-      const { data } = await this.midgardAPI.getPoolStatsLegacy(asset);
+      const midgard = await this.getMidgard();
+      const { data } = await midgard.getPoolStatsLegacy(asset);
 
       return data;
     } catch (error) {
@@ -150,7 +172,8 @@ class MidgardV2 implements MidgardSDKV2 {
   }): Promise<DepthHistory> {
     try {
       const { interval, count, from, to } = query;
-      const { data } = await this.midgardAPI.getDepthHistory(
+      const midgard = await this.getMidgard();
+      const { data } = await midgard.getDepthHistory(
         pool,
         interval,
         count,
@@ -167,7 +190,9 @@ class MidgardV2 implements MidgardSDKV2 {
   async getEarningsHistory(query: HistoryQuery): Promise<EarningsHistory> {
     try {
       const { interval, count, from, to } = query;
-      const { data } = await this.midgardAPI.getEarningsHistory(
+
+      const midgard = await this.getMidgard();
+      const { data } = await midgard.getEarningsHistory(
         interval,
         count,
         to,
@@ -189,7 +214,8 @@ class MidgardV2 implements MidgardSDKV2 {
   }): Promise<SwapHistory> {
     try {
       const { interval, count, from, to } = query;
-      const { data } = await this.midgardAPI.getSwapHistory(
+      const midgard = await this.getMidgard();
+      const { data } = await midgard.getSwapHistory(
         pool,
         interval,
         count,
@@ -212,7 +238,8 @@ class MidgardV2 implements MidgardSDKV2 {
   }): Promise<LiquidityHistory> {
     try {
       const { interval, count, from, to } = query;
-      const { data } = await this.midgardAPI.getLiquidityHistory(
+      const midgard = await this.getMidgard();
+      const { data } = await midgard.getLiquidityHistory(
         pool,
         interval,
         count,
@@ -228,7 +255,8 @@ class MidgardV2 implements MidgardSDKV2 {
 
   async getNodes(): Promise<Node[]> {
     try {
-      const { data } = await this.midgardAPI.getNodes();
+      const midgard = await this.getMidgard();
+      const { data } = await midgard.getNodes();
 
       return data;
     } catch (error) {
@@ -238,7 +266,8 @@ class MidgardV2 implements MidgardSDKV2 {
 
   async getNetworkData(): Promise<Network> {
     try {
-      const { data } = await this.midgardAPI.getNetworkData();
+      const midgard = await this.getMidgard();
+      const { data } = await midgard.getNetworkData();
 
       return data;
     } catch (error) {
@@ -250,7 +279,8 @@ class MidgardV2 implements MidgardSDKV2 {
     try {
       const { limit, offset, address, txId, asset, type } = params;
 
-      const { data } = await this.midgardAPI.getActions(
+      const midgard = await this.getMidgard();
+      const { data } = await midgard.getActions(
         limit,
         offset,
         address,
@@ -267,7 +297,8 @@ class MidgardV2 implements MidgardSDKV2 {
 
   async getMembersAddresses(): Promise<string[]> {
     try {
-      const { data } = await this.midgardAPI.getMembersAdresses();
+      const midgard = await this.getMidgard();
+      const { data } = await midgard.getMembersAdresses();
 
       return data;
     } catch (error) {
@@ -277,7 +308,8 @@ class MidgardV2 implements MidgardSDKV2 {
 
   async getMemberDetail(address: string): Promise<MemberDetails> {
     try {
-      const { data } = await this.midgardAPI.getMemberDetail(address);
+      const midgard = await this.getMidgard();
+      const { data } = await midgard.getMemberDetail(address);
 
       return data;
     } catch (error) {
@@ -287,7 +319,8 @@ class MidgardV2 implements MidgardSDKV2 {
 
   async getStats(): Promise<StatsData> {
     try {
-      const { data } = await this.midgardAPI.getStats();
+      const midgard = await this.getMidgard();
+      const { data } = await midgard.getStats();
 
       return data;
     } catch (error) {
@@ -297,7 +330,8 @@ class MidgardV2 implements MidgardSDKV2 {
 
   async getProxiedConstants(): Promise<Constants> {
     try {
-      const { data } = await this.midgardAPI.getProxiedConstants();
+      const midgard = await this.getMidgard();
+      const { data } = await midgard.getProxiedConstants();
 
       return data;
     } catch (error) {
@@ -307,7 +341,8 @@ class MidgardV2 implements MidgardSDKV2 {
 
   async getProxiedInboundAddresses(): Promise<InboundAddresses> {
     try {
-      const { data } = await this.midgardAPI.getProxiedInboundAddresses();
+      const midgard = await this.getMidgard();
+      const { data } = await midgard.getProxiedInboundAddresses();
 
       return data;
     } catch (error) {
@@ -317,7 +352,8 @@ class MidgardV2 implements MidgardSDKV2 {
 
   async getProxiedLastblock(): Promise<Lastblock> {
     try {
-      const { data } = await this.midgardAPI.getProxiedLastblock();
+      const midgard = await this.getMidgard();
+      const { data } = await midgard.getProxiedLastblock();
 
       return data;
     } catch (error) {
@@ -327,7 +363,8 @@ class MidgardV2 implements MidgardSDKV2 {
 
   async getProxiedQueue(): Promise<Queue> {
     try {
-      const { data } = await this.midgardAPI.getProxiedQueue();
+      const midgard = await this.getMidgard();
+      const { data } = await midgard.getProxiedQueue();
 
       return data;
     } catch (error) {

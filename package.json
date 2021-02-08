@@ -2,7 +2,14 @@
   "name": "midgard-sdk-v2",
   "version": "1.0.0",
   "description": "Javascript SDK for THORChain Midgard API V2",
-  "keywords": ["THORChain", "Midgard", "V2", "API", "SDK", "Typescript"],
+  "keywords": [
+    "THORChain",
+    "Midgard",
+    "V2",
+    "API",
+    "SDK",
+    "Typescript"
+  ],
   "author": "skyorion427",
   "license": "MIT",
   "main": "lib/index.js",
@@ -21,6 +28,7 @@
     "prepublish": "tsc --build"
   },
   "dependencies": {
+    "@thorchain/asgardex-midgard": "^1.1.0",
     "axios": "^0.21.1",
     "url": "^0.11.0"
   },
