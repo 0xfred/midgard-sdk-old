@@ -370,7 +370,7 @@ class MidgardV2 implements MidgardSDKV2 {
     }
   }
 
-  async getInboundAddressByChain(chain: string): Promise<PoolAddress | null> {
+  async getInboundAddressByChain(chain: string): Promise<PoolAddress> {
     try {
       const inboundData = await this.getInboundAddresses();
       const addresses = inboundData || [];
@@ -381,9 +381,9 @@ class MidgardV2 implements MidgardSDKV2 {
 
       if (chainAddress) {
         return chainAddress.address;
+      } else {
+        throw new Error('pool address not found');
       }
-
-      return null;
     } catch (error) {
       return Promise.reject(error);
     }
