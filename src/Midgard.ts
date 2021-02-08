@@ -62,7 +62,7 @@ export interface MidgardSDKV2 {
   getStats: () => Promise<StatsData>;
   getConstants: () => Promise<Constants>;
   getInboundAddresses: () => Promise<InboundAddresses>;
-  getInboundAddressByChain: (chain: string) => Promise<PoolAddress | null>;
+  getInboundAddressByChain: (chain: string) => Promise<PoolAddress>;
   getLastblock: () => Promise<Lastblock>;
   getQueue: () => Promise<Queue>;
 }
