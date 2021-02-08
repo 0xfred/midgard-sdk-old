@@ -41,3 +41,5 @@ export type ActionListParams = {
   limit: number;
   offset: number;
 };
+
+export type PoolAddress = string;

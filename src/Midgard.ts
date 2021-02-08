@@ -1,6 +1,7 @@
 import getMidgardBaseUrl from '@thorchain/asgardex-midgard';
 
 import { DefaultApi } from './api';
+import { InboundAddressesItem } from './api/api';
 import { Configuration } from './api/configuration';
 import {
   NetworkType,
@@ -25,6 +26,7 @@ import {
   InboundAddresses,
   Lastblock,
   Queue,
+  PoolAddress,
 } from './types';
 
 export interface MidgardSDKV2 {
@@ -57,10 +59,11 @@ export interface MidgardSDKV2 {
   getMembersAddresses: () => Promise<string[]>;
   getMemberDetail: (address: string) => Promise<MemberDetails>;
   getStats: () => Promise<StatsData>;
-  getProxiedConstants: () => Promise<Constants>;
-  getProxiedInboundAddresses: () => Promise<InboundAddresses>;
-  getProxiedLastblock: () => Promise<Lastblock>;
-  getProxiedQueue: () => Promise<Queue>;
+  getConstants: () => Promise<Constants>;
+  getInboundAddresses: () => Promise<InboundAddresses>;
+  getInboundAddressByChain: (chain: string) => Promise<PoolAddress | null>;
+  getLastblock: () => Promise<Lastblock>;
+  getQueue: () => Promise<Queue>;
 }
 
 class MidgardV2 implements MidgardSDKV2 {
@@ -71,27 +74,32 @@ class MidgardV2 implements MidgardSDKV2 {
 
   constructor(network: NetworkType = 'testnet') {
     this.network = network;
+    this.setBaseUrl();
   }
 
   /**
    * set midgard base url
    */
-  private setBaseUrl = async (refresh = false) => {
+  private setBaseUrl = async (noCache = false) => {
     try {
-      this.baseUrl = await getMidgardBaseUrl(this.network, refresh);
+      this.baseUrl = await getMidgardBaseUrl(this.network, noCache);
     } catch (error) {
-      console.log(error);
+      throw error;
     }
   };
 
   /**
    * get midgard base url
    */
-  getMidgard = async (refresh = false) => {
-    this.setBaseUrl(refresh);
+  getMidgard = async (noCache = false): Promise<DefaultApi> => {
+    try {
+      await this.setBaseUrl(noCache);
+      const apiConfig = new Configuration({ basePath: this.baseUrl });
 
-    const apiConfig = new Configuration({ basePath: this.baseUrl });
-    return new DefaultApi(apiConfig);
+      return new DefaultApi(apiConfig);
+    } catch (error) {
+      throw error;
+    }
   };
 
   getVersion = (): string => {
@@ -328,7 +336,7 @@ class MidgardV2 implements MidgardSDKV2 {
     }
   }
 
-  async getProxiedConstants(): Promise<Constants> {
+  async getConstants(): Promise<Constants> {
     try {
       const midgard = await this.getMidgard();
       const { data } = await midgard.getProxiedConstants();
@@ -339,18 +347,44 @@ class MidgardV2 implements MidgardSDKV2 {
     }
   }
 
-  async getProxiedInboundAddresses(): Promise<InboundAddresses> {
+  async getInboundAddresses(): Promise<InboundAddresses> {
     try {
       const midgard = await this.getMidgard();
       const { data } = await midgard.getProxiedInboundAddresses();
 
       return data;
     } catch (error) {
+      // try again
+      try {
+        const midgard = await this.getMidgard(true);
+        const { data } = await midgard.getProxiedInboundAddresses();
+        return data;
+      } catch (error) {
+        return Promise.reject(error);
+      }
+    }
+  }
+
+  async getInboundAddressByChain(chain: string): Promise<PoolAddress | null> {
+    try {
+      const inboundData = await this.getInboundAddresses();
+      const addresses = inboundData?.current ?? [];
+
+      const chainAddress = addresses.find(
+        (item: InboundAddressesItem) => item.chain === chain,
+      );
+
+      if (chainAddress) {
+        return chainAddress.address;
+      }
+
+      return null;
+    } catch (error) {
       return Promise.reject(error);
     }
   }
 
-  async getProxiedLastblock(): Promise<Lastblock> {
+  async getLastblock(): Promise<Lastblock> {
     try {
       const midgard = await this.getMidgard();
       const { data } = await midgard.getProxiedLastblock();
@@ -361,7 +395,7 @@ class MidgardV2 implements MidgardSDKV2 {
     }
   }
 
-  async getProxiedQueue(): Promise<Queue> {
+  async getQueue(): Promise<Queue> {
     try {
       const midgard = await this.getMidgard();
       const { data } = await midgard.getProxiedQueue();
