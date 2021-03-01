@@ -1,7 +1,6 @@
 import getMidgardBaseUrl from '@thorchain/asgardex-midgard';
 
 import { DefaultApi } from './api';
-import { InboundAddressesItem } from './api/api';
 import { Configuration } from './api/configuration';
 import { MIDGARD_TESTNET_URL } from './config';
 import {
@@ -24,7 +23,7 @@ import {
   MemberDetails,
   StatsData,
   Constants,
-  InboundAddresses,
+  InboundAddressesItem,
   Lastblock,
   Queue,
   PoolAddress,
@@ -61,7 +60,7 @@ export interface MidgardSDKV2 {
   getMemberDetail: (address: string) => Promise<MemberDetails>;
   getStats: () => Promise<StatsData>;
   getConstants: () => Promise<Constants>;
-  getInboundAddresses: () => Promise<InboundAddresses>;
+  getInboundAddresses: () => Promise<InboundAddressesItem[]>;
   getInboundAddressByChain: (chain: string) => Promise<PoolAddress>;
   getLastblock: () => Promise<Lastblock>;
   getQueue: () => Promise<Queue>;
@@ -352,7 +351,7 @@ class MidgardV2 implements MidgardSDKV2 {
     }
   }
 
-  async getInboundAddresses(): Promise<InboundAddresses> {
+  async getInboundAddresses(): Promise<InboundAddressesItem[]> {
     try {
       const midgard = await this.getMidgard();
       const { data } = await midgard.getProxiedInboundAddresses();
