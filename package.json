@@ -1,6 +1,6 @@
 {
   "name": "midgard-sdk-v2",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Javascript SDK for THORChain Midgard API V2",
   "keywords": [
     "THORChain",
