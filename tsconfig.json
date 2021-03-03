@@ -1,12 +1,12 @@
 {
   "compilerOptions": {
-    "target": "es6",
+    "target": "es5",
     "baseUrl": ".",
     "outDir": "lib",
     "declaration": true,
     "module": "commonjs",
     "moduleResolution": "node",
-    "lib": [],
+    "lib": ["DOM"],
     "sourceMap": true,
     "allowJs": true,
     "strict": true,

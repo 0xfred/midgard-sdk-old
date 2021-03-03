@@ -23,7 +23,6 @@ import {
   BaseAPI,
   RequiredError,
 } from './base';
-import { URL, URLSearchParams } from 'url';
 
 /**
  * action details among with related transactions

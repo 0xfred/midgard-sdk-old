@@ -29,8 +29,7 @@
   },
   "dependencies": {
     "@thorchain/asgardex-midgard": "^1.1.0",
-    "axios": "^0.21.1",
-    "url": "^0.11.0"
+    "axios": "^0.21.1"
   },
   "devDependencies": {
     "@commitlint/cli": "^11.0.0",
